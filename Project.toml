@@ -1,0 +1,4 @@
+name = "RecordIO"
+uuid = "cf564a75-8983-4f0e-be71-5ddf89398be2"
+version = "0.1.0"
+authors = ["Ciarán O'Mara <Ciaran.OMara@utas.edu.au>"]
