@@ -1,0 +1,13 @@
+[deps]
+Automa = "67c07d97-cdcb-5c2c-af73-a7f9c32a568b"
+BufferIO = "ff366017-094f-4144-bd70-a828a0d67152"
+MemoryViews = "a791c907-b98b-4e44-8f4d-e4c2362c6b2f"
+RecordIO = "cf564a75-8983-4f0e-be71-5ddf89398be2"
+StringViews = "354b36f9-a18e-4713-926e-db85100087ba"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+# Compat bounds for the packages that only the tests use.
+# The bounds of RecordIO's dependencies, BufferIO and MemoryViews, and of its weak dependency, Automa, are in its own Project.toml, which the workspace resolves together with this one.
+[compat]
+StringViews = "1.3, 2"
+Test = "1"
