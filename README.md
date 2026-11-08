@@ -92,6 +92,7 @@ A record type's `RecordIO.exception`, such as `RecordIO.MalformedRecord{Argument
 
 A source is an `IO`, which the reader buffers with a `BufReader`, or a BufferIO reader, whose buffer the reader parses from, wrapped with `expandable` if its buffer can't grow.
 To choose the size of the buffer, pass a `BufReader(io, size)`.
+With TranscodingStreams loaded, its decompressing streams are read too.
 A package makes its own kind of source readable by making it a BufferIO reader, and may give its own kind of offset in errors with a method of `RecordIO.offset`.
 
 ## Contributing

@@ -255,3 +255,11 @@ end
     # No bytes are no record.
     @test_throws ArgumentError("\"\" is not a record") RecordIO.parse_record(Note, UInt8[])
 end
+
+# A decompressing stream of TranscodingStreams, which BufferIO can't read directly, is read through the extension.
+@testset "TranscodingStreams" begin
+    @test Base.get_extension(RecordIO, :RecordIOTranscodingStreamsExt) !== nothing
+    compressed = transcode(GzipCompressor, Vector{UInt8}(TEXT))
+    @test map(fields, collect(RecordReader{ItemView}(GzipDecompressorStream(IOBuffer(compressed))))) == ITEMS
+    @test map(fields, RecordReader{Item{Owned}}(GzipDecompressorStream(IOBuffer(compressed)))) == ITEMS
+end

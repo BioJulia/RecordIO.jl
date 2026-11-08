@@ -11,6 +11,7 @@ using BufferIO: BufferIO, AbstractBufReader, BufReader, CursorReader, IOError, c
 using BufferIO.Testing: BoundedReader
 using MemoryViews: ImmutableMemoryView, MutableMemoryView
 using StringViews: StringView
+using CodecZlib: GzipCompressor, GzipDecompressorStream, transcode
 
 include("records.jl")
 
