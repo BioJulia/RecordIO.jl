@@ -24,6 +24,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - `RecordIO.offset`, by which a source of a package's own gives its own kind of offset in errors, such as a virtual offset of a BGZF file.
 - `RecordIO.offset(reader)`, `RecordIO.next_offset(reader)` and `RecordIO.number(reader)`, where a reader is in its source: the offset of the record that it last read, that of the next, and the number of its parses.
 - `RecordIO.try_parse_field`, which reads a number as `parse_field` does, and gives `nothing` where it throws, and `RecordIO.record_error(reader, cause)`, the error of the record last read, by which a package checks records against the specification of its format.
+- `RecordIO.problem`, which a record package defines for its records, and `RecordIO.is_valid` and `RecordIO.validate`, which follow from it: of a record, of a reader, with a loop whose step checks each record with what those before it left, and of a type of reader and a source.
 - `RecordIO.copy_bytes`, the copy of the bytes of a view, for its owned record.
 - The parser and the `malformation` of an owned record type follow from those of its views, by `RecordIO.borrowed_type`.
 - `RecordIO.parse_field` reads every value of an integer type, its least included, throws an `ArgumentError` for an integer without digits, such as a sign alone, and checks that its range is within the data.

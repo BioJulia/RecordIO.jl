@@ -29,6 +29,9 @@ public AbstractReader, records, read_next, remaining, offset, next_offset, numbe
 # Parsing: what the parsers of record packages share.
 public parse_field, try_parse_field, is_missing, separated, field_equals, LengthPrefixed, generate_read_record, generate_execute_code, malformed_record
 
+# The checks of records against the specification of their format.
+public problem, is_valid, validate, description, Stop
+
 include("errors.jl")
 include("ownership.jl")
 
@@ -42,5 +45,7 @@ include("reading/remaining.jl")
 include("parsing/fields.jl")
 include("parsing/length_prefixed.jl")
 include("parsing/automa.jl")
+
+include("validation.jl")
 
 end # module RecordIO

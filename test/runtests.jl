@@ -22,5 +22,8 @@ include("records.jl")
     @testset "parsing" begin
         include("parsing.jl")
     end
+    @testset "validation" begin
+        include("validation.jl")
+    end
 end
 
