@@ -14,7 +14,7 @@ using Mmap: Mmap
 using MemoryViews: ImmutableMemoryView, MutableMemoryView
 using StringViews: StringView
 
-export RecordReader
+export RecordReader, RecordWriter
 
 # Records that own or borrow their bytes.
 public Ownership, Owned, Borrowed, owned_type, borrowed_type, copy_bytes
@@ -32,6 +32,9 @@ public parse_field, try_parse_field, is_missing, separated, field_equals, Length
 # The checks of records against the specification of their format.
 public problem, is_valid, validate, description, Stop
 
+# Writing: what a record type says, the sinks' helpers, and the writers.
+public write_record, write_bytes, write_line, write_le, write_length_prefixed, AbstractWriter
+
 include("errors.jl")
 include("ownership.jl")
 
@@ -47,5 +50,9 @@ include("parsing/length_prefixed.jl")
 include("parsing/automa.jl")
 
 include("validation.jl")
+
+include("writing/protocol.jl")
+include("writing/abstract_writer.jl")
+include("writing/writer.jl")
 
 end # module RecordIO

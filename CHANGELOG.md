@@ -23,6 +23,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - `RecordIO.RecordError`, with the number of the parse and its offset in the source, and `RecordIO.MalformedRecord`, the errors of a record package, with its messages, at no cost per record.
 - `RecordIO.offset`, by which a source of a package's own gives its own kind of offset in errors, such as a virtual offset of a BGZF file.
 - `RecordIO.offset(reader)`, `RecordIO.next_offset(reader)` and `RecordIO.number(reader)`, where a reader is in its source: the offset of the record that it last read, that of the next, and the number of its parses.
+- `RecordWriter{T}(sink)`, the mirror of the reader, which writes records of type `T` to an `IO` or a BufferIO writer, as `RecordIO.write_record(sink, record)` of the record type writes one, and counts its records and bytes, `RecordIO.number(writer)` and `RecordIO.offset(writer)`.
+  `write` takes a record, several, or a vector or a reader of them, and a writer trusts its records.
+- `RecordIO.AbstractWriter{T}`, whose subtypes, the writers of record packages, write, flush and close by their `RecordWriter{T}`, and have `open(W, path; append)` and the form that takes a function and closes the writer afterwards.
+- `RecordIO.write_bytes`, `RecordIO.write_line`, `RecordIO.write_le` and `RecordIO.write_length_prefixed`, which write bytes, lines, little-endian integers and length-prefixed records to any sink, allocating nothing.
 - `RecordIO.try_parse_field`, which reads a number as `parse_field` does, and gives `nothing` where it throws, and `RecordIO.record_error(reader, cause)`, the error of the record last read, by which a package checks records against the specification of its format.
 - `RecordIO.problem`, which a record package defines for its records, and `RecordIO.is_valid` and `RecordIO.validate`, which follow from it: of a record, of a reader, with a loop whose step checks each record with what those before it left, and of a type of reader and a source.
 - `RecordIO.copy_bytes`, the copy of the bytes of a view, for its owned record.

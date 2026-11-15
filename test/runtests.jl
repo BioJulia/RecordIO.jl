@@ -25,5 +25,8 @@ include("records.jl")
     @testset "validation" begin
         include("validation.jl")
     end
+    @testset "writing" begin
+        include("writing.jl")
+    end
 end
 

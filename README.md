@@ -7,7 +7,7 @@
 [![Unit Tests](https://github.com/BioJulia/RecordIO.jl/actions/workflows/UnitTests.yml/badge.svg)](https://github.com/BioJulia/RecordIO.jl/actions/workflows/UnitTests.yml)
 [![codecov](https://codecov.io/gh/BioJulia/RecordIO.jl/branch/develop/graph/badge.svg)](https://codecov.io/gh/BioJulia/RecordIO.jl)
 
-Read the records of a file one after another, with a record parser that finds where each record ends while it finds its fields, so that each byte is read once.
+Read the records of a file one after another, and write them, with a record parser that finds where each record ends while it finds its fields, so that each byte is read once.
 
 A `RecordReader` parses the records straight from the buffer of a BufferIO reader, which it grows as the parser needs, so the parser never sees where one read from the source ends and the next begins.
 Everything but the source follows from the record type, so a reader of an indexed file can answer region queries with the same record type that reads the file from start to end.
@@ -87,6 +87,21 @@ Reading from it moves the reader on, so reading records continues after the byte
 
 If a record is malformed, a `RecordIO.RecordError` gives the number of the parse, which is its line number in a text file of one record a line, and its offset in the source, and the parsers that the generator makes quote the record.
 A record type's `RecordIO.exception`, such as `RecordIO.MalformedRecord{ArgumentError}("Malformed record")`, throws an exception of its own instead, at no cost per record.
+
+## Writing
+
+A `RecordWriter{T}` writes records of type `T` to an `IO` or a BufferIO writer, as `RecordIO.write_record(sink, record)` of the record type writes one.
+
+```julia
+RecordIO.write_record(sink, line::Line) = RecordIO.write_line(sink, line.bytes)
+
+open(RecordWriter{Line}, "copy.txt") do writer
+    write(writer, RecordReader{LineView}(open("lines.txt")))
+end
+```
+
+`write` takes a record, several, or a vector or a reader of them, and returns the number of bytes written; the records of a reader of views are each written before the next is read.
+A package's writer subtypes `RecordIO.AbstractWriter{T}`, as its reader subtypes `RecordIO.AbstractReader{T}`.
 
 ## Sources
 
