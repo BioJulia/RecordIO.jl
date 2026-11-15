@@ -33,3 +33,4 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - The parser and the `malformation` of an owned record type follow from those of its views, by `RecordIO.borrowed_type`.
 - `RecordIO.parse_field` reads every value of an integer type, its least included, throws an `ArgumentError` for an integer without digits, such as a sign alone, and checks that its range is within the data.
 - Requires Julia 1.12, for workspaces.
+- CI: unit tests on the oldest Julia that the compat admits and the latest release, on Linux, macOS and Windows, with coverage, documentation, Runic formatting, TagBot and Dependabot, with the actions pinned to commits.
