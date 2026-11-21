@@ -5,13 +5,22 @@ using RecordIO
 include(joinpath(pkgdir(RecordIO), "docs", "src", "line.jl"))
 ```
 
-A reader parses its records straight from the buffer of a BufferIO reader, which it grows as the parser needs.
-A source is either:
+A reader parses its records straight from where their bytes are, which depends on the source:
 
-- an `IO`, such as an `IOBuffer` or a file opened with `open`, which the reader buffers with a `BufReader`;
-- or a BufferIO reader, whose buffer the reader parses from.
+- a vector of bytes, or a regular file opened with `open`, is parsed as one view of its bytes, the file mapped into memory;
+- any other `IO`, such as an `IOBuffer`, is buffered with a `BufReader`, which the reader grows as the parser needs;
+- a BufferIO reader is parsed from its own buffer.
 
-The bytes are copied out of the source's buffer only into an owned record, so a reader of views reads its source without allocating for each record, or copying its bytes into a buffer of its own.
+The bytes are copied only into an owned record and, for an `IO` that isn't a regular file, into the `BufReader`'s buffer, so a reader of views reads its source without allocating for each record.
+
+## Bytes in memory
+
+```@example sources
+reader = RecordReader{Line{Owned}}(Vector{UInt8}("first\nsecond\n"))
+[String(text(line)) for line in reader]
+```
+
+A regular file opened with `open` is mapped into memory and parsed the same, so its bytes are read as the parser reaches them, and never copied into a buffer.
 
 ## `IO`s
 
@@ -32,6 +41,7 @@ reader = RecordReader{Line{Owned}}(BufReader(IOBuffer("a longer first line\nseco
 
 A decompressing stream of TranscodingStreams, such as `CodecZlib.GzipDecompressorStream`, is an `IO` too.
 BufferIO can't read it directly, since two methods of `readbytes!` apply to it, so with TranscodingStreams loaded, a reader reads it through an adapter of its own.
+Its bytes are copied once more than a BufferIO reader's would be: from the stream's buffer into the `BufReader`'s.
 
 ## BufferIO readers
 

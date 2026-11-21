@@ -4,8 +4,8 @@
 Read the records of a source one after another, with a record parser that finds where each record ends while it finds its fields, so that each byte is read once.
 
 A [`RecordReader{T}`](@ref RecordReader) yields records of type `T`, which a record package defines, with [`RecordIO.read_record(T, stream)`](@ref RecordIO.read_record), its parser, which makes each record.
-The reader manages the stream of bytes: it parses straight from the buffer of a BufferIO reader, which grows when the parser asks for more bytes, so the parser never sees where one read from the source ends and the next begins.
-Sources are `IO`s, which it buffers with a `BufReader`, and BufferIO readers.
+The reader manages the stream of bytes: it parses straight from where they are, one view of them where they are in memory, or can be mapped into it, and otherwise the buffer of a BufferIO reader, which grows when the parser asks for more bytes, so the parser never sees where one read from the source ends and the next begins.
+Sources are vectors of bytes, `IO`s, which it maps into memory where they are regular files and otherwise buffers with a `BufReader`, and BufferIO readers.
 """
 module RecordIO
 

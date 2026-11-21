@@ -2,7 +2,7 @@
 
 RecordIO reads the records of a file one after another, and writes them, with a record parser that finds where each record ends while it finds its fields, so that each byte is read once.
 
-A [`RecordReader`](@ref) parses the records straight from the buffer of a BufferIO reader, which it grows as the parser needs, so the parser never sees where one read from the source ends and the next begins.
+A [`RecordReader`](@ref) parses the records straight from where their bytes are: one view of them where they are in memory, or can be mapped into it, as a regular file's can, and otherwise the buffer of a BufferIO reader, which it grows as the parser needs, so the parser never sees where one read from the source ends and the next begins.
 Everything but the source follows from the record type: its parser, which of its parses are records, and its errors.
 So a reader of an indexed file can answer region queries with the same record type that reads the file from start to end.
 
@@ -13,7 +13,7 @@ So a reader of an indexed file can answer region queries with the same record ty
 - **Records:** a design of records, of their bytes and where their fields are in them, which own their bytes, as `R{Owned}`, or borrow those of the reader's buffer, as `R{Borrowed}`, which allocates nothing for each.
 - **Parsers:** a contract for record parsers, a generator of parsers from Automa state machines, and a framing of length-prefixed binary records.
 - **Fields:** functions that read the fields of a record's bytes, by the type wanted.
-- **Sources:** `IO`s, which the reader buffers with BufferIO, and BufferIO readers, whose buffers it parses from.
+- **Sources:** vectors of bytes and regular files, which the reader parses as one view of their bytes, other `IO`s, which it buffers with BufferIO, and BufferIO readers, whose buffers it parses from.
 
 It doesn't parse any format itself: a format's package brings the record type and its parser.
 
@@ -32,9 +32,10 @@ RecordIO is that machinery, written once, with three aims:
   RecordIO turns bytes into records, so the two meet where a decompressing stream is the source of a [`RecordReader`](@ref), which it reads with TranscodingStreams loaded.
 - **Automa.jl's streams**, which many of the BioJulia packages read with, mark where a record starts in the buffer of a `TranscodingStream`, and copy the record's bytes out of it as the parser reads.
   A RecordIO parser reads a [`RecordIO.Stream`](@ref), whose buffer grows until the whole record is in it and keeps its first byte at position 1, so a record can be a view of the buffer, and a source in memory, or a file mapped into it, is parsed with no copy at all.
+  Any other `IO`, a `TranscodingStream` among them, is read into a BufferIO buffer first, which costs a copy of its bytes that a source in memory and a BufferIO reader don't.
 - **BioGenerics.jl's `AbstractReader` and `AbstractWriter`** are interfaces: `open`, the do-block form, and iteration by `read!` into a mutable record, with the reading left to each format.
   RecordIO does the reading: a `RecordReader{T}` is the iterator, and [`RecordIO.AbstractReader{T}`](@ref RecordIO.AbstractReader) and [`RecordIO.AbstractWriter{T}`](@ref RecordIO.AbstractWriter) are typed by their records, so that a package's `Reader{Record{Borrowed}}` reads views and `Reader{Record{Owned}}` copies, with offsets in the source, the bytes after the records, and checks of records against their specification.
-- **BufferIO.jl** is the buffered reading that RecordIO parses from, and its readers are sources of a `RecordReader` as they are.
+- **BufferIO.jl** is the buffer that RecordIO parses from where the bytes aren't in memory, and its readers are sources of a `RecordReader` as they are.
 
 ## Installation
 

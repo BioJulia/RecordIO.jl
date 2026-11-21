@@ -9,7 +9,7 @@
 
 Read the records of a file one after another, and write them, with a record parser that finds where each record ends while it finds its fields, so that each byte is read once.
 
-A `RecordReader` parses the records straight from the buffer of a BufferIO reader, which it grows as the parser needs, so the parser never sees where one read from the source ends and the next begins.
+A `RecordReader` parses the records straight from where their bytes are: one view of them where they are in memory, or can be mapped into it, as a regular file's can, and otherwise the buffer of a BufferIO reader, which it grows as the parser needs, so the parser never sees where one read from the source ends and the next begins.
 Everything but the source follows from the record type, so a reader of an indexed file can answer region queries with the same record type that reads the file from start to end.
 
 For each part in depth, including record types and their parsers, owned records and views, sources and errors, see the [documentation](https://biojulia.github.io/RecordIO.jl/stable).
@@ -17,7 +17,7 @@ For each part in depth, including record types and their parsers, owned records 
 ## Why RecordIO
 
 Many of the BioJulia packages that read a file format each carry the same machinery to read and write their records; RecordIO is that machinery, written once, so that each byte is read once, a record that borrows the reader's buffer allocates nothing, and one parser serves a file read from start to end and a region query of its index.
-It sits above TranscodingStreams.jl, whose decompressing streams are its sources, and above BufferIO.jl, whose buffer it parses from; [Why RecordIO](https://biojulia.github.io/RecordIO.jl/stable/#Why-RecordIO) says how it differs from these and from Automa.jl's streams and BioGenerics.jl's readers.
+It reads any source, the decompressing streams of TranscodingStreams.jl among them, and parses from the bytes themselves where they are in memory, and otherwise from the buffer of a BufferIO.jl reader; [Why RecordIO](https://biojulia.github.io/RecordIO.jl/stable/#Why-RecordIO) says how it differs from these and from Automa.jl's streams and BioGenerics.jl's readers.
 
 ## Installation
 
@@ -110,9 +110,10 @@ A package's writer subtypes `RecordIO.AbstractWriter{T}`, as its reader subtypes
 
 ## Sources
 
-A source is an `IO`, which the reader buffers with a `BufReader`, or a BufferIO reader, whose buffer the reader parses from, wrapped with `expandable` if its buffer can't grow.
+A vector of bytes, or a regular file opened with `open`, is parsed as one view of its bytes, the file mapped into memory.
+Any other `IO` is buffered with a `BufReader`, and a BufferIO reader is parsed from its own buffer, wrapped with `expandable` if its buffer can't grow.
 To choose the size of the buffer, pass a `BufReader(io, size)`.
-With TranscodingStreams loaded, its decompressing streams are read too.
+With TranscodingStreams loaded, its decompressing streams are read too, through a `BufReader`, which copies their bytes once more.
 A package makes its own kind of source readable by making it a BufferIO reader, and may give its own kind of offset in errors with a method of `RecordIO.offset`.
 
 ## Contributing
