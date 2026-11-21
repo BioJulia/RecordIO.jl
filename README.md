@@ -14,6 +14,11 @@ Everything but the source follows from the record type, so a reader of an indexe
 
 For each part in depth, including record types and their parsers, owned records and views, sources and errors, see the [documentation](https://biojulia.github.io/RecordIO.jl/stable).
 
+## Why RecordIO
+
+Many of the BioJulia packages that read a file format each carry the same machinery to read and write their records; RecordIO is that machinery, written once, so that each byte is read once, a record that borrows the reader's buffer allocates nothing, and one parser serves a file read from start to end and a region query of its index.
+It sits above TranscodingStreams.jl, whose decompressing streams are its sources, and above BufferIO.jl, whose buffer it parses from; [Why RecordIO](https://biojulia.github.io/RecordIO.jl/stable/#Why-RecordIO) says how it differs from these and from Automa.jl's streams and BioGenerics.jl's readers.
+
 ## Installation
 
 ```julia
