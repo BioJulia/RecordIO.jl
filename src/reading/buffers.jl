@@ -54,7 +54,8 @@ isopen_buffer(buffer::GrowingBuffer) = isopen(buffer.reader)
 
 # The buffer of a source, by its type: one view of all its bytes where they are in memory, as a vector's and a `CursorReader`'s are, or where they can be mapped into memory, as a regular file's can; otherwise a BufferIO buffer that grows.
 # An `IOBuffer` has no public view of its bytes, so it is read through a buffer that grows, rather than copied.
-buffer_of(source::AbstractVector{UInt8}) = ViewBuffer(ImmutableMemoryView(source))
+# A vector is parsed where its bytes are, so they need to be contiguous in memory: those of a type of which MemoryViews makes a view.
+buffer_of(source::AbstractVector{UInt8}) = hasmethod(MemoryView, Tuple{typeof(source)}) ? ViewBuffer(ImmutableMemoryView(source)) : not_contiguous(source)
 buffer_of(source::CursorReader) = ViewBuffer(get_buffer(source))
 buffer_of(source::IOStream) = isfile(stat(source)) ? ViewBuffer(mapped(source)) : GrowingBuffer(buffered(source))
 buffer_of(source) = GrowingBuffer(buffered(source))
@@ -70,4 +71,5 @@ end
 # The BufferIO reader of a source whose bytes aren't in memory: a buffer that can grow to hold a record of any length.
 buffered(io::IO) = BufReader(io)
 buffered(reader::AbstractBufReader) = expandable(reader)
+@noinline not_contiguous(source) = throw(ArgumentError("a RecordReader reads a vector whose bytes are contiguous in memory, of which MemoryViews makes a view, but not a $(typeof(source)); read a copy of it, as a Vector{UInt8}"))
 buffered(source) = throw(ArgumentError("a RecordReader reads an IO, a BufferIO reader, or a vector of bytes, but not a $(typeof(source))"))

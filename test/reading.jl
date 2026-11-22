@@ -39,6 +39,11 @@ end
     @test buffer(open(plain)) isa RecordIO.ViewBuffer
     @test buffer(BufReader(IOBuffer(TEXT), 7)) isa RecordIO.GrowingBuffer
     @test buffer(trickle(TEXT)) isa RecordIO.GrowingBuffer
+    # A vector is read where its bytes are, so they need to be contiguous: a view of a vector is, a strided view and a range aren't.
+    @test buffer(view(Vector{UInt8}(TEXT), 2:100)) isa RecordIO.ViewBuffer
+    @test buffer(codeunits(TEXT)) isa RecordIO.ViewBuffer
+    @test_throws ArgumentError RecordReader{ItemView}(view(Vector{UInt8}(TEXT), 1:2:100))
+    @test_throws ArgumentError RecordReader{ItemView}(0x30:0x39)
     # A file is mapped from its position, and an empty file is no bytes.
     io = open(plain)
     readline(io)

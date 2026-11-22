@@ -110,7 +110,7 @@ A package's writer subtypes `RecordIO.AbstractWriter{T}`, as its reader subtypes
 
 ## Sources
 
-A vector of bytes, or a regular file opened with `open`, is parsed as one view of its bytes, the file mapped into memory.
+A vector of bytes that are contiguous in memory, or a regular file opened with `open`, is parsed as one view of its bytes, the file mapped into memory.
 Any other `IO` is buffered with a `BufReader`, and a BufferIO reader is parsed from its own buffer, wrapped with `expandable` if its buffer can't grow.
 To choose the size of the buffer, pass a `BufReader(io, size)`.
 With TranscodingStreams loaded, its decompressing streams are read too, through a `BufReader`, which copies their bytes once more.

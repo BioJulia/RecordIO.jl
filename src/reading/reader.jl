@@ -7,7 +7,7 @@
 
 Read the records of type `T` of `source` one after another, each made by [`RecordIO.read_record(T, stream)`](@ref RecordIO.read_record), a parser that the package of `T` defines, with its errors, [`RecordIO.exception(T)`](@ref RecordIO.exception).
 
-`source` is a vector of bytes, an `IO`, or a BufferIO reader.
+`source` is a vector of bytes that are contiguous in memory, such as a `Vector{UInt8}` or a contiguous view of one, an `IO`, or a BufferIO reader.
 Where its bytes are in memory, as a vector's and a `CursorReader`'s are, or can be mapped into memory, as a regular file's can, the reader parses them as one view; otherwise it parses from a BufferIO buffer that grows: a `BufReader` of an `IO`, or the buffer of a BufferIO reader, wrapped with `expandable` if it can't grow.
 To choose the size of the buffer, pass a `BufReader(io, size)`.
 The reader takes over its source: read from it only through the reader, or through [`RecordIO.remaining`](@ref).

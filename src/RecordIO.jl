@@ -11,7 +11,7 @@ module RecordIO
 
 using BufferIO: BufferIO, AbstractBufReader, BufReader, CursorReader, consume, expandable, fill_buffer, get_buffer, get_nonempty_buffer
 using Mmap: Mmap
-using MemoryViews: ImmutableMemoryView, MutableMemoryView
+using MemoryViews: MemoryView, ImmutableMemoryView, MutableMemoryView
 using StringViews: StringView
 
 export RecordReader, RecordWriter

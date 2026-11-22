@@ -7,7 +7,7 @@ include(joinpath(pkgdir(RecordIO), "docs", "src", "line.jl"))
 
 A reader parses its records straight from where their bytes are, which depends on the source:
 
-- a vector of bytes, or a regular file opened with `open`, is parsed as one view of its bytes, the file mapped into memory;
+- a vector of bytes that are contiguous in memory, or a regular file opened with `open`, is parsed as one view of its bytes, the file mapped into memory;
 - any other `IO`, such as an `IOBuffer`, is buffered with a `BufReader`, which the reader grows as the parser needs;
 - a BufferIO reader is parsed from its own buffer.
 
@@ -19,6 +19,9 @@ The bytes are copied only into an owned record and, for an `IO` that isn't a reg
 reader = RecordReader{Line{Owned}}(Vector{UInt8}("first\nsecond\n"))
 [String(text(line)) for line in reader]
 ```
+
+A vector is parsed where its bytes are, so they need to be contiguous in memory: a vector of a type of which MemoryViews makes a view, such as a `Vector{UInt8}`, a contiguous view of one, or the `codeunits` of a `String`.
+Any other vector, such as a strided view or a range, throws an `ArgumentError`; read a copy of it, as a `Vector{UInt8}`, instead.
 
 A regular file opened with `open` is mapped into memory and parsed the same, so its bytes are read as the parser reaches them, and never copied into a buffer.
 
